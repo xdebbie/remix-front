@@ -5,32 +5,32 @@ export const Wrapper = styled.div`
 `;
 
 export const SongHeader = styled.div`
-  display: grid;
-  grid-template-columns: 50px 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   align-items: center;
-  font-weight: bold;
-  padding: 10px 0;
   border-bottom: 2px solid #000;
+  display: grid;
+  font-weight: bold;
   gap: 10px;
+  grid-template-columns: 50px 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  padding: 10px 0;
   
   img {
-    width: 50px;
     height: 50px;
     object-fit: cover;
+    width: 50px;
   }
 `;
 
 export const SongItem = styled.div`
-  display: grid;
-  grid-template-columns: 50px 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   align-items: center;
-  padding: 10px 0;
   border-bottom: 1px solid #eee;
+  display: grid;
   gap: 10px;
+  grid-template-columns: 50px 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  padding: 10px 0;
 
   img {
-    width: 50px;
     height: 50px;
     object-fit: cover;
+    width: 50px;
   }
 `;

@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { fetchSongs } from '../../services/api/SongData/SongData';
 import { AddSongForm } from '../AddSongForm/AddSongForm';
-import { Wrapper, SongHeader, SongItem } from './SongList.styled';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Button } from '@mui/material';
+import { Wrapper, SongHeader, SongItem, Popover, ButtonRow } from './SongList.styled';
 
 interface Song {
   _id?: string;
@@ -21,6 +23,11 @@ export const SongList = () => {
   const [songs, setSongs] = useState<Song[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [deletePopoverAnchor, setDeletePopoverAnchor] = useState<HTMLButtonElement | null>(null);
+  const [songToDelete, setSongToDelete] = useState<Song | null>(null);
+
+
+  const apiUrl = process.env.REACT_APP_API_URL || '';
 
   useEffect(() => {
     // Fetch songs data when the component mounts
@@ -36,7 +43,9 @@ export const SongList = () => {
     fetchData();
   }, []);
 
-  const apiUrl = process.env.REACT_APP_API_URL || '';
+  const handleToggleForm = () => {
+    setIsFormOpen(!isFormOpen);
+  };
 
   const handleAddSong = async (newSongData: Song) => {
     try {
@@ -54,8 +63,30 @@ export const SongList = () => {
     }
   };
 
-  const handleToggleForm = () => {
-    setIsFormOpen(!isFormOpen);
+  const handleOpenDeletePopover = (event: React.MouseEvent<HTMLButtonElement>, song: Song) => {
+    setSongToDelete(song);
+    setDeletePopoverAnchor(event.currentTarget);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (songToDelete) {
+      try {
+        // Delete the song using its id
+        await axios.delete(`${apiUrl}/${songToDelete._id}`);
+        const updatedSongs = await fetchSongs();
+        setSongs(updatedSongs);
+      } catch (error) {
+        console.error('Error deleting song:', error);
+      }
+    }
+
+    setDeletePopoverAnchor(null);
+    setSongToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setDeletePopoverAnchor(null);
+    setSongToDelete(null);
   };
 
   return (
@@ -86,10 +117,38 @@ export const SongList = () => {
           <p>{song.label}</p>
           <p>{song.year}</p>
           <p>{song.length}</p>
-          <p><a href={song.spotify}>Spotify</a></p>
-          <p><a href={song.apple}>Apple Music</a></p>
+          <p><a href={song.spotify} target="_blank" rel="noopener noreferrer">Spotify</a></p>
+          <p><a href={song.apple} target="_blank" rel="noopener noreferrer">Apple Music</a></p>
+          <td>
+            <button onClick={(event) => handleOpenDeletePopover(event, song)}>
+              <DeleteIcon />
+            </button>
+          </td>
         </SongItem>
       ))}
+      <Popover
+        open={Boolean(deletePopoverAnchor)}
+        anchorEl={deletePopoverAnchor}
+        onClose={handleCancelDelete}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <p>Do you really want to delete this song?</p>
+        <ButtonRow>
+          <Button onClick={handleCancelDelete} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="primary">
+            Delete
+          </Button>
+        </ButtonRow>
+      </Popover>
     </Wrapper>
   );
 };

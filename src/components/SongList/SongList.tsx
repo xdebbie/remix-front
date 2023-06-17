@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Button } from '@mui/material';
+import { Delete, Edit } from '@mui/icons-material';
+
 import { fetchSongs } from '../../services/api/SongData/SongData';
 import { AddSongForm } from '../AddSongForm/AddSongForm';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { Button } from '@mui/material';
+import { EditSongForm } from '../EditSongForm/EditSongForm';
 import { Wrapper, SongHeader, SongItem, Popover, ButtonRow } from './SongList.styled';
 
 interface Song {
@@ -25,7 +27,8 @@ export const SongList = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [deletePopoverAnchor, setDeletePopoverAnchor] = useState<HTMLButtonElement | null>(null);
   const [songToDelete, setSongToDelete] = useState<Song | null>(null);
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editedSong, setEditedSong] = useState<Song | null>(null);
 
   const apiUrl = process.env.REACT_APP_API_URL || '';
 
@@ -89,6 +92,37 @@ export const SongList = () => {
     setSongToDelete(null);
   };
 
+  const handleOpenDialog = (song: Song) => {
+    setEditedSong(song);
+    setIsDialogOpen(true);
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, field: keyof Song) => {
+    const value = event.target.value;
+    setEditedSong((prevSong) => {
+      if (prevSong) {
+        return {
+          ...prevSong,
+          [field]: value,
+        };
+      }
+      return null;
+    });
+  };
+
+  const handleUpdateSong = async () => {
+    try {
+      // Send a PUT request to update the song
+      await axios.put(`${apiUrl}/${editedSong?._id}`, editedSong);
+      const updatedSongs = await fetchSongs();
+      setSongs(updatedSongs);
+      setEditedSong(null);
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('Error updating song:', error);
+    }
+  };
+
   return (
     <Wrapper>
       <h1>Song List</h1>
@@ -119,11 +153,14 @@ export const SongList = () => {
           <p>{song.length}</p>
           <p><a href={song.spotify} target="_blank" rel="noopener noreferrer">Spotify</a></p>
           <p><a href={song.apple} target="_blank" rel="noopener noreferrer">Apple Music</a></p>
-          <td>
-            <button onClick={(event) => handleOpenDeletePopover(event, song)}>
-              <DeleteIcon />
+          <div>
+            <button onClick={() => handleOpenDialog(song)}>
+              <Edit />
             </button>
-          </td>
+            <button onClick={(event) => handleOpenDeletePopover(event, song)}>
+              <Delete />
+            </button>
+          </div>
         </SongItem>
       ))}
       <Popover
@@ -149,6 +186,13 @@ export const SongList = () => {
           </Button>
         </ButtonRow>
       </Popover>
+      <EditSongForm
+        editedSong={editedSong}
+        isDialogOpen={isDialogOpen}
+        handleInputChange={handleInputChange}
+        handleUpdateSong={handleUpdateSong}
+        handleCloseDialog={() => setIsDialogOpen(false)}
+      />
     </Wrapper>
   );
 };

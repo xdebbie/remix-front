@@ -96,7 +96,7 @@ const handleSubmit = (e: FormEvent) => {
         />
       </div>
       <div>
-        <label htmlFor="album">Label:</label>
+        <label htmlFor="label">Label:</label>
         <input
           type="text"
           id="label"
@@ -106,7 +106,7 @@ const handleSubmit = (e: FormEvent) => {
         />
       </div>
       <div>
-        <label htmlFor="album">Year:</label>
+        <label htmlFor="year">Year:</label>
         <input
           type="text"
           id="year"
@@ -116,7 +116,7 @@ const handleSubmit = (e: FormEvent) => {
         />
       </div>
       <div>
-        <label htmlFor="album">Length:</label>
+        <label htmlFor="length">Length:</label>
         <input
           type="text"
           id="length"
@@ -126,7 +126,7 @@ const handleSubmit = (e: FormEvent) => {
         />
       </div>
       <div>
-        <label htmlFor="album">Spotify link:</label>
+        <label htmlFor="spotify">Spotify link:</label>
         <input
           type="text"
           id="spotify"
@@ -136,7 +136,7 @@ const handleSubmit = (e: FormEvent) => {
         />
       </div>
       <div>
-        <label htmlFor="album">Apple Music link:</label>
+        <label htmlFor="apple">Apple Music link:</label>
         <input
           type="text"
           id="apple"
@@ -146,7 +146,7 @@ const handleSubmit = (e: FormEvent) => {
         />
       </div>
       <div>
-        <label htmlFor="album">Artwork link:</label>
+        <label htmlFor="artwork">Artwork link:</label>
         <input
           type="text"
           id="artwork"

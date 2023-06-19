@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@auth0/auth0-react": "^2.1.1",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@mui/core": "^5.0.0-alpha.54",
+    "@mui/base": "^5.0.0-alpha.54",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.3",
     "@testing-library/jest-dom": "^5.16.5",

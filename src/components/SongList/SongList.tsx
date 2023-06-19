@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useAuth0 } from "@auth0/auth0-react";
 import { Button } from '@mui/material';
 import { Delete, Edit } from '@mui/icons-material';
 
@@ -32,6 +33,8 @@ export const SongList = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL || '';
 
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+
   useEffect(() => {
     // Fetch songs data when the component mounts
     const fetchData = async () => {
@@ -52,9 +55,17 @@ export const SongList = () => {
 
   const handleAddSong = async (newSongData: Song) => {
     try {
+      // Obtain the access token
+      const accessToken = await getAccessTokenSilently();
+      // Include the access token in the Authorisation header
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
       setIsAdding(true);
       // Send a POST request to add a new song
-      await axios.post(apiUrl, newSongData);
+      await axios.post(apiUrl, newSongData, config);
       // Fetch the updated songs data
       const updatedSongs = await fetchSongs();
       setSongs(updatedSongs);
@@ -74,8 +85,16 @@ export const SongList = () => {
   const handleConfirmDelete = async () => {
     if (songToDelete) {
       try {
+        // Obtain the access token
+        const accessToken = await getAccessTokenSilently();
+        // Include the access token in the Authorisation header
+        const config = {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
         // Delete the song using its id
-        await axios.delete(`${apiUrl}/${songToDelete._id}`);
+        await axios.delete(`${apiUrl}/${songToDelete._id}`, config);
         const updatedSongs = await fetchSongs();
         setSongs(updatedSongs);
       } catch (error) {
@@ -112,8 +131,16 @@ export const SongList = () => {
 
   const handleUpdateSong = async () => {
     try {
+      // Obtain the access token
+      const accessToken = await getAccessTokenSilently();
+      // Include the access token in the Authorization header
+      const config = {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      };
       // Send a PUT request to update the song
-      await axios.put(`${apiUrl}/${editedSong?._id}`, editedSong);
+      await axios.put(`${apiUrl}/${editedSong?._id}`, editedSong, config);
       const updatedSongs = await fetchSongs();
       setSongs(updatedSongs);
       setEditedSong(null);
@@ -129,7 +156,7 @@ export const SongList = () => {
       {isFormOpen ? (
         <AddSongForm onAddSong={handleAddSong} isAdding={isAdding} />
       ) : (
-        <button onClick={handleToggleForm}>Add a new song</button>
+        isAuthenticated && <button onClick={handleToggleForm}>Add a new song</button>
       )}
       <SongHeader>
         <p></p>
@@ -153,14 +180,16 @@ export const SongList = () => {
           <p>{song.length}</p>
           <p><a href={song.spotify} target="_blank" rel="noopener noreferrer">Spotify</a></p>
           <p><a href={song.apple} target="_blank" rel="noopener noreferrer">Apple Music</a></p>
-          <div>
-            <button onClick={() => handleOpenDialog(song)}>
-              <Edit />
-            </button>
-            <button onClick={(event) => handleOpenDeletePopover(event, song)}>
-              <Delete />
-            </button>
-          </div>
+          {isAuthenticated &&
+            <div>
+              <button onClick={() => handleOpenDialog(song)}>
+                <Edit />
+              </button>
+              <button onClick={(event) => handleOpenDeletePopover(event, song)}>
+                <Delete />
+              </button>
+            </div>
+          }
         </SongItem>
       ))}
       <Popover
